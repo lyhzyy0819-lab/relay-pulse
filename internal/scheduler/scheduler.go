@@ -9,6 +9,7 @@ import (
 
 	"monitor/internal/config"
 	"monitor/internal/monitor"
+	"monitor/internal/notifier"
 	"monitor/internal/storage"
 )
 
@@ -24,6 +25,10 @@ type Scheduler struct {
 	// 配置引用（支持热更新）
 	cfg   *config.AppConfig
 	cfgMu sync.RWMutex
+
+	// 通知管理器（可选）
+	notifier   *notifier.Manager
+	notifierMu sync.RWMutex
 
 	// 防止重复触发
 	checkInProgress bool
@@ -181,6 +186,13 @@ func (s *Scheduler) runChecks(ctx context.Context, allowStagger bool) {
 				log.Printf("[Scheduler] 保存结果失败 %s-%s-%s: %v",
 					t.Provider, t.Service, t.Channel, err)
 			}
+
+			// 触发告警检查
+			s.notifierMu.RLock()
+			if s.notifier != nil {
+				s.notifier.NotifyIfNeeded(ctx, result)
+			}
+			s.notifierMu.RUnlock()
 		}(task, idx)
 	}
 
@@ -207,7 +219,28 @@ func (s *Scheduler) UpdateConfig(cfg *config.AppConfig) {
 		s.mu.Unlock()
 	}
 
+	// 更新通知器配置
+	s.notifierMu.RLock()
+	if s.notifier != nil {
+		s.notifier.UpdateConfig(&cfg.Notifier)
+	}
+	s.notifierMu.RUnlock()
+
 	log.Printf("[Scheduler] 配置已更新，下次巡检将使用新配置")
+}
+
+// SetNotifier 设置通知管理器
+func (s *Scheduler) SetNotifier(n *notifier.Manager) {
+	s.notifierMu.Lock()
+	defer s.notifierMu.Unlock()
+	s.notifier = n
+}
+
+// GetNotifier 获取通知管理器
+func (s *Scheduler) GetNotifier() *notifier.Manager {
+	s.notifierMu.RLock()
+	defer s.notifierMu.RUnlock()
+	return s.notifier
 }
 
 // TriggerNow 立即触发一次巡检（热更新后调用）

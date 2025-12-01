@@ -11,6 +11,7 @@ import (
 	"monitor/internal/api"
 	"monitor/internal/buildinfo"
 	"monitor/internal/config"
+	"monitor/internal/notifier"
 	"monitor/internal/scheduler"
 	"monitor/internal/storage"
 )
@@ -98,6 +99,18 @@ func main() {
 		interval = time.Minute
 	}
 	sched := scheduler.NewScheduler(store, interval)
+
+	// 初始化通知管理器（可选）
+	if cfg.Notifier.Enabled {
+		notifierMgr, err := notifier.NewManager(&cfg.Notifier)
+		if err != nil {
+			log.Printf("⚠️ 通知管理器初始化失败: %v", err)
+		} else {
+			sched.SetNotifier(notifierMgr)
+			log.Printf("✅ 企业微信告警已启用")
+		}
+	}
+
 	sched.Start(ctx, cfg)
 
 	// 创建API服务器
@@ -108,10 +121,31 @@ func main() {
 		// 配置热更新回调
 		sched.UpdateConfig(newCfg)
 		server.UpdateConfig(newCfg)
+
+		// 热更新通知器
+		if newCfg.Notifier.Enabled && sched.GetNotifier() == nil {
+			// 新启用告警
+			notifierMgr, err := notifier.NewManager(&newCfg.Notifier)
+			if err != nil {
+				log.Printf("⚠️ 热更新时通知管理器初始化失败: %v", err)
+			} else {
+				sched.SetNotifier(notifierMgr)
+				log.Printf("✅ 企业微信告警已启用（热更新）")
+			}
+		} else if !newCfg.Notifier.Enabled && sched.GetNotifier() != nil {
+			// 关闭告警
+			if err := sched.GetNotifier().Close(); err != nil {
+				log.Printf("⚠️ 关闭通知管理器失败: %v", err)
+			}
+			sched.SetNotifier(nil)
+			log.Printf("⚠️ 企业微信告警已禁用（热更新）")
+		}
+
 		// 重新运行 channel 迁移（支持运行时添加 channel）
 		if err := store.MigrateChannelData(buildChannelMigrationMappings(newCfg.Monitors)); err != nil {
 			log.Printf("⚠️ 热更新时 channel 迁移失败: %v", err)
 		}
+
 		// 立即触发一次巡检，确保新配置立即生效
 		sched.TriggerNow()
 	})

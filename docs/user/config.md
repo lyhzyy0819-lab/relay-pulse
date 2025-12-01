@@ -631,6 +631,130 @@ monitors:
 2. SQLite: 检查文件路径和权限
 3. 查看数据库日志
 
+## 消息模板自定义
+
+Relay Pulse 支持自定义企业微信告警消息的模板，包括标题和内容格式。
+
+### 配置示例
+
+在 `notifier.wecom` 下添加 `templates` 配置：
+
+```yaml
+notifier:
+  enabled: true
+  wecom:
+    enabled: true
+    webhook_url: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=YOUR-KEY"
+
+    # 消息模板配置（可选，未配置时使用默认模板）
+    templates:
+      # 服务不可用告警（绿/黄 → 红）
+      down:
+        title: "⚠️ 服务不可用告警"
+        content: |
+          > **服务商**: {{.Provider}}
+          > **服务**: {{.Service}}
+          {{- if .Channel}}
+          > **通道**: {{.Channel}}
+          {{- end}}
+          > **当前状态**: {{.StatusEmoji}} {{.StatusName}}
+          {{- if .SubStatusName}}
+          > **失败原因**: {{.SubStatusName}} (HTTP {{.HTTPStatusHint}})
+          {{- end}}
+          > **告警时间**: {{.Timestamp}}
+
+          *来自 RelayPulse 监控*
+
+      # 服务恢复告警（红 → 绿/黄）
+      up:
+        title: "✅ 服务恢复告警"
+        content: |
+          > **服务商**: {{.Provider}}
+          > **当前状态**: {{.StatusEmoji}} {{.StatusName}}
+          {{- if gt .Latency 0}}
+          > **响应延迟**: {{.Latency}} ms
+          {{- end}}
+          > **恢复时间**: {{.Timestamp}}
+
+      # 持续不可用告警
+      continuous_down:
+        title: "🔴 服务持续不可用告警"
+        content: |
+          > **服务商**: {{.Provider}}
+          {{- if gt .FailureCount 0}}
+          > **连续失败**: {{.FailureCount}} 次
+          {{- end}}
+```
+
+### 可用变量
+
+模板中可以使用以下变量：
+
+| 变量 | 类型 | 说明 | 示例 |
+|------|------|------|------|
+| `.Provider` | string | 服务商名称 | "Code-CLI" |
+| `.Service` | string | 服务类型 | "cc" |
+| `.Channel` | string | 业务通道（可能为空） | "vip-channel" |
+| `.StatusName` | string | 状态名称 | "不可用" |
+| `.StatusEmoji` | string | 状态 emoji | "🔴" |
+| `.SubStatusName` | string | 细分状态名称 | "限流" |
+| `.HTTPStatusHint` | string | HTTP 状态码提示 | "429" |
+| `.Timestamp` | string | 格式化时间 | "2025-12-01 15:04:05" |
+| `.FailureCount` | int | 连续失败次数（continuous_down） | 3 |
+| `.Latency` | int | 响应延迟（毫秒，up） | 234 |
+
+### Go template 语法
+
+模板使用 Go `text/template` 语法，支持条件判断和数值比较：
+
+```yaml
+# 条件判断（有 Channel 时才显示）
+{{- if .Channel}}
+> **通道**: {{.Channel}}
+{{- end}}
+
+# 数值比较（延迟大于 0）
+{{- if gt .Latency 0}}
+> **响应延迟**: {{.Latency}} ms
+{{- end}}
+
+# 数值比较（失败次数大于 5）
+{{- if gt .FailureCount 5}}
+> **严重程度**: 🔴 紧急
+{{- else}}
+> **严重程度**: 🟠 重要
+{{- end}}
+```
+
+### 常用模板函数
+
+- `gt` - 大于 (greater than)
+- `lt` - 小于 (less than)
+- `eq` - 等于 (equal)
+- `ne` - 不等于 (not equal)
+
+### 向后兼容
+
+- **未配置 `templates`**：自动使用默认模板（与硬编码行为一致）
+- **部分配置**：未配置的模板使用默认值（如只配置 `down`，其他使用默认）
+- **配置验证**：启动时检查模板语法，失败则拒绝加载
+
+### 完整示例
+
+```yaml
+# 自定义简化版模板
+notifier:
+  wecom:
+    templates:
+      down:
+        title: "🚨 紧急：服务挂了！"
+        content: "{{.Provider}} {{.Service}} 在 {{.Timestamp}} 发生故障"
+
+      up:
+        title: "✅ 服务恢复"
+        content: "{{.Provider}} {{.Service}} 已于 {{.Timestamp}} 恢复正常"
+```
+
 ## 下一步
 
 - [运维手册](operations.md) - 日常运维和故障排查

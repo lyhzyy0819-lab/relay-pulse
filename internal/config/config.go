@@ -63,6 +63,46 @@ type PostgresConfig struct {
 	ConnMaxLifetime string `yaml:"conn_max_lifetime" json:"conn_max_lifetime"`
 }
 
+// NotifierConfig 通知配置
+type NotifierConfig struct {
+	Enabled                    bool   `yaml:"enabled" json:"enabled"`
+	ContinuousFailureThreshold int    `yaml:"continuous_failure_threshold" json:"continuous_failure_threshold"`
+	MinNotifyInterval          string `yaml:"min_notify_interval" json:"min_notify_interval"`
+
+	// 解析后的最小通知间隔（内部使用）
+	MinNotifyIntervalDuration time.Duration `yaml:"-" json:"-"`
+
+	// 企业微信配置
+	WeCom WeComConfig `yaml:"wecom" json:"wecom"`
+}
+
+// MessageTemplate 消息模板配置
+type MessageTemplate struct {
+	Title   string `yaml:"title" json:"title"`     // 标题（如 "⚠️ 服务不可用告警"）
+	Content string `yaml:"content" json:"content"` // 模板内容（支持 Go text/template 语法）
+}
+
+// MessageTemplates 所有消息模板
+type MessageTemplates struct {
+	Down           *MessageTemplate `yaml:"down" json:"down"`                       // 服务不可用告警
+	Up             *MessageTemplate `yaml:"up" json:"up"`                           // 服务恢复告警
+	ContinuousDown *MessageTemplate `yaml:"continuous_down" json:"continuous_down"` // 持续不可用告警
+}
+
+// WeComConfig 企业微信配置
+type WeComConfig struct {
+	Enabled     bool   `yaml:"enabled" json:"enabled"`
+	WebhookURL  string `yaml:"webhook_url" json:"-"` // 不输出到 JSON（安全）
+	Timeout     string `yaml:"timeout" json:"timeout"`
+	RetryCount  int    `yaml:"retry_count" json:"retry_count"`
+
+	// 解析后的超时时间（内部使用）
+	TimeoutDuration time.Duration `yaml:"-" json:"-"`
+
+	// 消息模板（可选，未配置时使用默认模板）
+	Templates *MessageTemplates `yaml:"templates,omitempty" json:"templates,omitempty"`
+}
+
 // AppConfig 应用配置
 type AppConfig struct {
 	// 巡检间隔（支持 Go duration 格式，例如 "30s"、"1m", "5m"）
@@ -107,6 +147,9 @@ type AppConfig struct {
 	// 默认: https://relaypulse.top
 	// 可通过环境变量 MONITOR_PUBLIC_BASE_URL 覆盖
 	PublicBaseURL string `yaml:"public_base_url" json:"public_base_url"`
+
+	// 通知配置
+	Notifier NotifierConfig `yaml:"notifier" json:"notifier"`
 
 	Monitors []ServiceConfig `yaml:"monitors"`
 }
@@ -171,6 +214,13 @@ func (c *AppConfig) Validate() error {
 			return fmt.Errorf("重复的监控项: provider=%s, service=%s, channel=%s", m.Provider, m.Service, m.Channel)
 		}
 		seen[key] = true
+	}
+
+	// 验证消息模板（如果通知已启用且企业微信已配置）
+	if c.Notifier.Enabled && c.Notifier.WeCom.Enabled {
+		if err := validateMessageTemplates(c.Notifier.WeCom.Templates); err != nil {
+			return fmt.Errorf("消息模板验证失败: %w", err)
+		}
 	}
 
 	return nil
@@ -303,6 +353,59 @@ func (c *AppConfig) Normalize() error {
 		log.Println("[Config] 警告: SQLite 使用单连接（max_open_conns=1），并发查询无性能收益，建议关闭 enable_concurrent_query")
 	}
 
+	// 通知配置默认值
+	if c.Notifier.ContinuousFailureThreshold == 0 {
+		c.Notifier.ContinuousFailureThreshold = 3 // 默认连续失败 3 次
+	}
+	if c.Notifier.ContinuousFailureThreshold < 1 {
+		return fmt.Errorf("continuous_failure_threshold 必须 >= 1，当前值: %d", c.Notifier.ContinuousFailureThreshold)
+	}
+
+	// 最小通知间隔（冷却期）
+	if c.Notifier.MinNotifyInterval == "" {
+		c.Notifier.MinNotifyIntervalDuration = 5 * time.Minute // 默认 5 分钟
+	} else {
+		d, err := time.ParseDuration(c.Notifier.MinNotifyInterval)
+		if err != nil {
+			return fmt.Errorf("解析 min_notify_interval 失败: %w", err)
+		}
+		if d <= 0 {
+			return fmt.Errorf("min_notify_interval 必须大于 0")
+		}
+		c.Notifier.MinNotifyIntervalDuration = d
+	}
+
+	// 企业微信配置默认值
+	if c.Notifier.WeCom.Timeout == "" {
+		c.Notifier.WeCom.TimeoutDuration = 5 * time.Second // 默认 5 秒
+	} else {
+		d, err := time.ParseDuration(c.Notifier.WeCom.Timeout)
+		if err != nil {
+			return fmt.Errorf("解析 wecom.timeout 失败: %w", err)
+		}
+		if d <= 0 {
+			return fmt.Errorf("wecom.timeout 必须大于 0")
+		}
+		c.Notifier.WeCom.TimeoutDuration = d
+	}
+
+	if c.Notifier.WeCom.RetryCount == 0 {
+		c.Notifier.WeCom.RetryCount = 2 // 默认重试 2 次
+	}
+	if c.Notifier.WeCom.RetryCount < 0 {
+		return fmt.Errorf("wecom.retry_count 不能为负数，当前值: %d", c.Notifier.WeCom.RetryCount)
+	}
+
+	// 企业微信消息模板默认值
+	if c.Notifier.WeCom.Templates == nil {
+		c.Notifier.WeCom.Templates = GetDefaultMessageTemplates()
+	}
+
+	// 企业微信启用但未配置 webhook URL 时的警告
+	if c.Notifier.Enabled && c.Notifier.WeCom.Enabled && c.Notifier.WeCom.WebhookURL == "" {
+		log.Println("[Config] 警告: 企业微信通知已启用但未配置 webhook_url，告警将无法发送")
+	}
+
 	// 将全局慢请求阈值下发到每个监控项，并标准化 category、URLs、provider_slug
 	slugSet := make(map[string]int) // slug -> monitor index (用于检测重复)
 	for i := range c.Monitors {
@@ -384,6 +487,11 @@ func (c *AppConfig) ApplyEnvOverrides() {
 	// SQLite 配置环境变量覆盖
 	if envPath := os.Getenv("MONITOR_SQLITE_PATH"); envPath != "" {
 		c.Storage.SQLite.Path = envPath
+	}
+
+	// 通知配置环境变量覆盖
+	if envWebhook := os.Getenv("MONITOR_NOTIFIER_WECOM_WEBHOOK_URL"); envWebhook != "" {
+		c.Notifier.WeCom.WebhookURL = envWebhook
 	}
 
 	// API Key 覆盖
@@ -483,6 +591,7 @@ func (c *AppConfig) Clone() *AppConfig {
 		ConcurrentQueryLimit:  c.ConcurrentQueryLimit,
 		Storage:               c.Storage,
 		PublicBaseURL:         c.PublicBaseURL,
+		Notifier:              c.Notifier,
 		Monitors:              make([]ServiceConfig, len(c.Monitors)),
 	}
 	copy(clone.Monitors, c.Monitors)
