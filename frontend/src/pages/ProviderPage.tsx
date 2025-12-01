@@ -5,12 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { Server } from 'lucide-react';
 import { useMonitorData } from '../hooks/useMonitorData';
 import { Header } from '../components/Header';
-import { Controls } from '../components/Controls';
 import { StatusTable } from '../components/StatusTable';
-import { StatusCard } from '../components/StatusCard';
 import { Tooltip } from '../components/Tooltip';
 import { Footer } from '../components/Footer';
-import type { ViewMode, SortConfig, TooltipState, ProcessedMonitorData } from '../types';
+import type { SortConfig, TooltipState, ProcessedMonitorData } from '../types';
 
 // Provider 名称规范化（小写、去空格）
 function canonicalize(value?: string): string {
@@ -33,12 +31,11 @@ export default function ProviderPage() {
   // 规范化 provider slug
   const normalizedProvider = canonicalize(provider);
 
-  // 状态管理
-  const [timeRange, setTimeRange] = useState('24h');
-  const [filterService, setFilterService] = useState('all');
-  const [filterChannel, setFilterChannel] = useState('all');
-  // filterCategory 在 Provider 页面固定为 'all'，不需要状态
-  const [viewMode, setViewMode] = useState<ViewMode>('table');
+  // 固定的状态（不再需要用户交互控制）
+  const timeRange = '24h';
+  const filterService = 'all';
+  const filterChannel = 'all';
+
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: 'uptime',
     direction: 'desc',
@@ -51,7 +48,7 @@ export default function ProviderPage() {
   });
 
   // 数据获取 - 先获取全部数据用于构建映射
-  const { data: allData, loading, error, stats, channels, slowLatencyMs, refetch } = useMonitorData({
+  const { data: allData, loading, error, stats, slowLatencyMs } = useMonitorData({
     timeRange,
     filterService,
     filterProvider: 'all', // 先获取全部数据
@@ -71,13 +68,6 @@ export default function ProviderPage() {
 
   // 按 providerId 过滤数据
   const data = allData.filter((item) => item.providerId === realProviderId);
-
-  // 过滤 channels：只显示当前 provider 的通道
-  const providerChannels = channels.filter((channel) => {
-    return allData.some(
-      (item) => item.providerId === realProviderId && item.channel === channel
-    );
-  });
 
   // 软 404 处理：只在 provider slug 真正不存在时返回 404
   // 避免网络错误或筛选条件导致的空数据被误判为 404
@@ -119,11 +109,6 @@ export default function ProviderPage() {
     }));
   };
 
-  // 刷新处理
-  const handleRefresh = () => {
-    refetch();
-  };
-
   return (
     <>
       <Helmet>
@@ -148,28 +133,7 @@ export default function ProviderPage() {
         {/* 完整模式：显示 Header */}
         {!isEmbedMode && <Header stats={stats} />}
 
-        {/* 控制面板 - 隐藏 provider 和 category 筛选器，只显示当前 provider 的通道 */}
-        <Controls
-          timeRange={timeRange}
-          filterService={filterService}
-          filterProvider="all"
-          filterChannel={filterChannel}
-          filterCategory="all"
-          viewMode={viewMode}
-          loading={loading}
-          providers={[]} // 空数组 → 隐藏 provider 筛选器
-          channels={providerChannels} // 只显示当前 provider 的通道
-          showCategoryFilter={false} // 隐藏分类筛选器
-          onTimeRangeChange={setTimeRange}
-          onServiceChange={setFilterService}
-          onProviderChange={() => {}} // 无操作
-          onChannelChange={setFilterChannel}
-          onCategoryChange={() => {}} // 无操作
-          onViewModeChange={setViewMode}
-          onRefresh={handleRefresh}
-        />
-
-        {/* 主内容区域 - 移除 py-6 以减小与控制面板的间距 */}
+        {/* 主内容区域 */}
         <main>
           {error ? (
             <div className="flex flex-col items-center justify-center py-20 text-rose-400">
@@ -187,39 +151,18 @@ export default function ProviderPage() {
               <p className="text-lg">{t('common.noData')}</p>
             </div>
           ) : (
-            <>
-              {viewMode === 'table' && (
-                <StatusTable
-                  data={data}
-                  sortConfig={sortConfig}
-                  timeRange={timeRange}
-                  slowLatencyMs={slowLatencyMs}
-                  showCategoryTag={false}
-                  showProvider={!isEmbedMode}
-                  showSponsor={false}
-                  onSort={handleSort}
-                  onBlockHover={handleBlockHover}
-                  onBlockLeave={handleBlockLeave}
-                />
-              )}
-
-              {viewMode === 'grid' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {data.map((item) => (
-                    <StatusCard
-                      key={item.id}
-                      item={item}
-                      timeRange={timeRange}
-                      slowLatencyMs={slowLatencyMs}
-                      showCategoryTag={false}
-                      showProvider={!isEmbedMode}
-                      onBlockHover={handleBlockHover}
-                      onBlockLeave={handleBlockLeave}
-                    />
-                  ))}
-                </div>
-              )}
-            </>
+            <StatusTable
+              data={data}
+              sortConfig={sortConfig}
+              timeRange={timeRange}
+              slowLatencyMs={slowLatencyMs}
+              showCategoryTag={false}
+              showProvider={!isEmbedMode}
+              showSponsor={false}
+              onSort={handleSort}
+              onBlockHover={handleBlockHover}
+              onBlockLeave={handleBlockLeave}
+            />
           )}
         </main>
 

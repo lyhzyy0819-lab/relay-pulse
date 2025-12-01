@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { Activity, Shield, AlertTriangle, Github, Tag, ChevronDown, ChevronUp, Bug } from 'lucide-react';
+import { Github, Tag, Bug } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useVersionInfo } from '../hooks/useVersionInfo';
 import { FEEDBACK_URLS } from '../constants';
@@ -7,60 +6,18 @@ import { FEEDBACK_URLS } from '../constants';
 export function Footer() {
   const { t } = useTranslation();
   const { versionInfo } = useVersionInfo();
-  const [expanded, setExpanded] = useState(false);
-
-  const notices = [
-    {
-      icon: Activity,
-      title: t('footer.disclaimer.dataReference.title'),
-      text: t('footer.disclaimer.dataReference.text'),
-    },
-    {
-      icon: Shield,
-      title: t('footer.disclaimer.neutralMaintenance.title'),
-      text: t('footer.disclaimer.neutralMaintenance.text'),
-    },
-    {
-      icon: AlertTriangle,
-      title: t('footer.disclaimer.monitoringScope.title'),
-      text: t('footer.disclaimer.monitoringScope.text'),
-    },
-  ];
 
   return (
     <footer className="mt-4 bg-slate-900/60 border border-slate-800 rounded-2xl p-4 sm:p-5 text-slate-400">
-      {/* 免责声明标题 - 移动端可折叠 */}
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="sm:hidden w-full flex items-center justify-between text-sm font-semibold text-slate-200 mb-2"
-      >
-        <span>{t('footer.disclaimer.title')}</span>
-        {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-      </button>
-      <div className="hidden sm:block text-sm font-semibold text-slate-200 mb-3">{t('footer.disclaimer.title')}</div>
-
-      {/* 免责声明内容 - 移动端折叠 */}
-      <div className={`${expanded ? 'block' : 'hidden'} sm:block`}>
-        <div className="grid gap-2 sm:gap-3 sm:grid-cols-3">
-          {notices.map(({ icon: Icon, title, text }) => (
-            <div
-              key={title}
-              className="flex items-start gap-2 sm:gap-3 bg-slate-900/40 border border-slate-800 rounded-xl p-2.5 sm:p-3"
-            >
-              <div className="p-1.5 sm:p-2 rounded-lg bg-slate-800/80 text-cyan-300 flex-shrink-0">
-                <Icon size={14} className="sm:w-4 sm:h-4" />
-              </div>
-              <div className="text-[11px] sm:text-xs leading-relaxed">
-                <div className="font-semibold text-slate-200 mb-0.5 sm:mb-1">{title}</div>
-                <p className="text-slate-500">{text}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+      {/* 简化的免责声明 */}
+      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4 mb-4">
+        <p className="text-sm text-slate-400 text-center">
+          {t('footer.disclaimer.text')}
+        </p>
       </div>
 
       {/* GitHub 链接与版本信息 */}
-      <div className={`${expanded ? 'mt-4 pt-4' : 'mt-2 pt-2 sm:mt-4 sm:pt-4'} border-t border-slate-800/50 flex flex-col sm:flex-row items-center justify-center gap-2 text-xs`}>
+      <div className="border-t border-slate-800/50 pt-4 flex flex-col sm:flex-row items-center justify-center gap-2 text-xs">
         <div className="flex items-center gap-2 flex-wrap justify-center">
           <a
             href="https://github.com/prehisle/relay-pulse"
@@ -96,6 +53,13 @@ export function Footer() {
             </div>
           </>
         )}
+      </div>
+
+      {/* ICP 备案信息 */}
+      <div className="mt-4 pt-4 border-t border-slate-700">
+        <p className="text-xs text-slate-500 text-center">
+          {t('footer.icp')}
+        </p>
       </div>
     </footer>
   );

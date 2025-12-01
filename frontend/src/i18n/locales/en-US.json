@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "RelayPulse - Availability monitoring for LLM relay services",
-    "description": "RelayPulse - Monitor availability, latency, and sponsored routes of LLM relay services worldwide in real time, helping developers quickly evaluate provider quality and discover the most stable API providers. Supports connectivity checks for mainstream models such as Claude and GPT."
+    "title": "code-cli - Availability monitoring for LLM relay services",
+    "description": "code-cli - Monitor availability, latency, and sponsored routes of LLM relay services worldwide in real time, helping developers quickly evaluate provider quality and discover the most stable API providers. Supports connectivity checks for mainstream models such as Claude and GPT."
   },
   "common": {
     "loading": "Syncing data nodes...",
@@ -123,22 +123,11 @@
   },
   "footer": {
     "disclaimer": {
-      "title": "Disclaimer",
-      "dataReference": {
-        "title": "Data for reference only",
-        "text": "Affected by network conditions; does not represent providers' absolute quality"
-      },
-      "neutralMaintenance": {
-        "title": "Neutral maintenance",
-        "text": "This project is maintained personally, remains neutral, and has no vested interests"
-      },
-      "monitoringScope": {
-        "title": "Monitoring scope",
-        "text": "Connectivity + latency + content validation; data for reference only"
-      }
+      "text": "Disclaimer: To be added"
     },
     "issuesBtn": "Report an issue",
-    "openSourceLabel": "Open source project, contributions welcome"
+    "openSourceLabel": "Open source project, contributions welcome",
+    "icp": "ICP Filing: To be added"
   },
   "provider": {
     "pageTitle": "{{name}} - Service Monitoring",

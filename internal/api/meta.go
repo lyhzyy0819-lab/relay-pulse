@@ -126,33 +126,33 @@ func getMetaContent(langCode string, slug string, providerName string, isProvide
 		escapedName := html.EscapeString(providerName)
 		switch langCode {
 		case "zh-CN":
-			title = fmt.Sprintf("%s 服务可用性监控 - RelayPulse", escapedName)
+			title = fmt.Sprintf("%s 服务可用性监控 - code-cli", escapedName)
 			description = fmt.Sprintf("实时监控 %s 的 API 可用性、延迟和服务质量，查看历史稳定性数据和赞助链路状态。", escapedName)
 		case "en-US":
-			title = fmt.Sprintf("%s Service Availability Monitoring - RelayPulse", escapedName)
+			title = fmt.Sprintf("%s Service Availability Monitoring - code-cli", escapedName)
 			description = fmt.Sprintf("Monitor %s API availability, latency, and service quality in real time. View historical stability data and sponsored route status.", escapedName)
 		case "ru-RU":
-			title = fmt.Sprintf("Мониторинг доступности сервиса %s - RelayPulse", escapedName)
+			title = fmt.Sprintf("Мониторинг доступности сервиса %s - code-cli", escapedName)
 			description = fmt.Sprintf("Мониторинг доступности API %s, задержки и качества обслуживания в реальном времени.", escapedName)
 		case "ja-JP":
-			title = fmt.Sprintf("%s サービス可用性監視 - RelayPulse", escapedName)
+			title = fmt.Sprintf("%s サービス可用性監視 - code-cli", escapedName)
 			description = fmt.Sprintf("%s の API 可用性、レイテンシ、サービス品質をリアルタイムで監視します。", escapedName)
 		}
 	} else {
 		// 首页
 		switch langCode {
 		case "zh-CN":
-			title = "RelayPulse - LLM 中转服务可用性监控"
-			description = "RelayPulse - 实时监控全球 LLM 中转服务的可用性、延迟与赞助链路，帮助开发者快速评估服务商质量，发现最稳定的 API 提供商。支持 Claude、GPT 等主流模型的连通性检测。"
+			title = "code-cli - LLM 中转服务可用性监控"
+			description = "code-cli - 实时监控全球 LLM 中转服务的可用性、延迟与赞助链路，帮助开发者快速评估服务商质量，发现最稳定的 API 提供商。支持 Claude、GPT 等主流模型的连通性检测。"
 		case "en-US":
-			title = "RelayPulse - Availability monitoring for LLM relay services"
-			description = "RelayPulse - Monitor availability, latency, and sponsored routes of LLM relay services worldwide in real time, helping developers quickly evaluate provider quality and discover the most stable API providers. Supports connectivity checks for mainstream models such as Claude and GPT."
+			title = "code-cli - Availability monitoring for LLM relay services"
+			description = "code-cli - Monitor availability, latency, and sponsored routes of LLM relay services worldwide in real time, helping developers quickly evaluate provider quality and discover the most stable API providers. Supports connectivity checks for mainstream models such as Claude and GPT."
 		case "ru-RU":
-			title = "RelayPulse - Мониторинг доступности сервисов ретрансляции LLM"
-			description = "RelayPulse - Мониторинг доступности, задержки и спонсорских маршрутов сервисов ретрансляции LLM по всему миру в реальном времени, помогая разработчикам быстро оценивать качество провайдеров."
+			title = "code-cli - Мониторинг доступности сервисов ретрансляции LLM"
+			description = "code-cli - Мониторинг доступности, задержки и спонсорских маршрутов сервисов ретрансляции LLM по всему миру в реальном времени, помогая разработчикам быстро оценивать качество провайдеров."
 		case "ja-JP":
-			title = "RelayPulse - LLM リレーサービスの可用性監視"
-			description = "RelayPulse - 世界中の LLM リレーサービスの可用性、レイテンシ、スポンサールートをリアルタイムで監視し、開発者が迅速にプロバイダーの品質を評価できるようにします。"
+			title = "code-cli - LLM リレーサービスの可用性監視"
+			description = "code-cli - 世界中の LLM リレーサービスの可用性、レイテンシ、スポンサールートをリアルタイムで監視し、開発者が迅速にプロバイダーの品質を評価できるようにします。"
 		}
 	}
 
@@ -274,7 +274,7 @@ func generatePageMeta(meta MetaData, baseURL string) PageMeta {
 		jsonLDData := map[string]interface{}{
 			"@context":   "https://schema.org",
 			"@type":      "WebSite",
-			"name":       "RelayPulse",
+			"name":       "code-cli",
 			"url":        baseURL,
 			"description": meta.Description,
 			"inLanguage": []string{"zh-CN", "en-US", "ru-RU", "ja-JP"},
@@ -383,19 +383,19 @@ func inject404Meta(indexHTML string, langCode string) string {
 	var title, description string
 	switch langCode {
 	case "zh-CN":
-		title = "页面未找到 - RelayPulse"
+		title = "页面未找到 - code-cli"
 		description = "您访问的服务商页面不存在"
 	case "en-US":
-		title = "Page Not Found - RelayPulse"
+		title = "Page Not Found - code-cli"
 		description = "The provider page you are looking for does not exist"
 	case "ru-RU":
-		title = "Страница не найдена - RelayPulse"
+		title = "Страница не найдена - code-cli"
 		description = "Страница провайдера, которую вы ищете, не существует"
 	case "ja-JP":
-		title = "ページが見つかりません - RelayPulse"
+		title = "ページが見つかりません - code-cli"
 		description = "お探しのプロバイダーページは存在しません"
 	default:
-		title = "Page Not Found - RelayPulse"
+		title = "Page Not Found - code-cli"
 		description = "The provider page you are looking for does not exist"
 	}
 

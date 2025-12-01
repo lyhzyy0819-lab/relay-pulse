@@ -1,41 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Server } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { Header } from './components/Header';
-import { Controls } from './components/Controls';
 import { StatusTable } from './components/StatusTable';
-import { StatusCard } from './components/StatusCard';
 import { Tooltip } from './components/Tooltip';
 import { Footer } from './components/Footer';
 import { useMonitorData } from './hooks/useMonitorData';
-import { useUrlState } from './hooks/useUrlState';
-import { trackPeriodChange, trackServiceFilter, trackEvent } from './utils/analytics';
-import type { TooltipState, ProcessedMonitorData } from './types';
+import type { TooltipState, ProcessedMonitorData, SortConfig } from './types';
 
 function App() {
   const { t, i18n } = useTranslation();
 
-  // 使用 URL 状态同步 Hook，支持收藏和分享
-  const [urlState, urlActions] = useUrlState();
-  const {
-    timeRange,
-    filterProvider,
-    filterService,
-    filterChannel,
-    filterCategory,
-    viewMode,
-    sortConfig,
-  } = urlState;
-  const {
-    setTimeRange,
-    setFilterProvider,
-    setFilterService,
-    setFilterChannel,
-    setFilterCategory,
-    setViewMode,
-    setSortConfig,
-  } = urlActions;
+  // 固定的筛选和视图状态（不再需要用户交互控制）
+  const timeRange = '24h';
+  const filterProvider = 'all';
+  const filterService = 'all';
+  const filterChannel = 'all';
+  const filterCategory = 'all';
+
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
+    key: 'uptime',
+    direction: 'desc',
+  });
 
   const [tooltip, setTooltip] = useState<TooltipState>({
     show: false,
@@ -44,7 +31,7 @@ function App() {
     data: null,
   });
 
-  const { loading, error, data, stats, channels, providers, slowLatencyMs, refetch } = useMonitorData({
+  const { loading, error, data, stats, slowLatencyMs } = useMonitorData({
     timeRange,
     filterService,
     filterProvider,
@@ -52,38 +39,6 @@ function App() {
     filterCategory,
     sortConfig,
   });
-
-  // 追踪时间范围变化
-  useEffect(() => {
-    trackPeriodChange(timeRange);
-  }, [timeRange]);
-
-  // 追踪服务筛选变化
-  useEffect(() => {
-    trackServiceFilter(
-      filterProvider !== 'all' ? filterProvider : undefined,
-      filterService !== 'all' ? filterService : undefined
-    );
-  }, [filterProvider, filterService]);
-
-  // 追踪通道筛选变化
-  useEffect(() => {
-    if (filterChannel !== 'all') {
-      trackEvent('filter_channel', { channel: filterChannel });
-    }
-  }, [filterChannel]);
-
-  // 追踪分类筛选变化
-  useEffect(() => {
-    if (filterCategory !== 'all') {
-      trackEvent('filter_category', { category: filterCategory });
-    }
-  }, [filterCategory]);
-
-  // 追踪视图模式切换
-  useEffect(() => {
-    trackEvent('change_view_mode', { mode: viewMode });
-  }, [viewMode]);
 
   const handleSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'desc';
@@ -110,11 +65,6 @@ function App() {
     setTooltip((prev) => ({ ...prev, show: false }));
   };
 
-  const handleRefresh = () => {
-    trackEvent('manual_refresh');
-    refetch();
-  };
-
   return (
     <>
       {/* 动态更新 HTML meta 标签 */}
@@ -138,26 +88,6 @@ function App() {
           {/* 头部 */}
           <Header stats={stats} />
 
-          {/* 控制栏 */}
-          <Controls
-            filterProvider={filterProvider}
-            filterService={filterService}
-            filterChannel={filterChannel}
-            filterCategory={filterCategory}
-            timeRange={timeRange}
-            viewMode={viewMode}
-            loading={loading}
-            channels={channels}
-            providers={providers}
-            onProviderChange={setFilterProvider}
-            onServiceChange={setFilterService}
-            onChannelChange={setFilterChannel}
-            onCategoryChange={setFilterCategory}
-            onTimeRangeChange={setTimeRange}
-            onViewModeChange={setViewMode}
-            onRefresh={handleRefresh}
-          />
-
           {/* 内容区域 */}
           {error ? (
             <div className="flex flex-col items-center justify-center py-20 text-rose-400">
@@ -175,34 +105,15 @@ function App() {
               <p className="text-lg">{t('common.noData')}</p>
             </div>
           ) : (
-            <>
-              {viewMode === 'table' && (
-                <StatusTable
-                  data={data}
-                  sortConfig={sortConfig}
-                  timeRange={timeRange}
-                  slowLatencyMs={slowLatencyMs}
-                  onSort={handleSort}
-                  onBlockHover={handleBlockHover}
-                  onBlockLeave={handleBlockLeave}
-                />
-              )}
-
-              {viewMode === 'grid' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {data.map((item) => (
-                    <StatusCard
-                      key={item.id}
-                      item={item}
-                      timeRange={timeRange}
-                      slowLatencyMs={slowLatencyMs}
-                      onBlockHover={handleBlockHover}
-                      onBlockLeave={handleBlockLeave}
-                    />
-                  ))}
-                </div>
-              )}
-            </>
+            <StatusTable
+              data={data}
+              sortConfig={sortConfig}
+              timeRange={timeRange}
+              slowLatencyMs={slowLatencyMs}
+              onSort={handleSort}
+              onBlockHover={handleBlockHover}
+              onBlockLeave={handleBlockLeave}
+            />
           )}
 
           {/* 免责声明 */}

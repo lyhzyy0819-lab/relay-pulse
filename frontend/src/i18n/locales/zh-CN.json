@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "RelayPulse - LLM 中转服务可用性监控",
-    "description": "RelayPulse - 实时监控全球 LLM 中转服务的可用性、延迟与赞助链路，帮助开发者快速评估服务商质量，发现最稳定的 API 提供商。支持 Claude、GPT 等主流模型的连通性检测。"
+    "title": "code-cli - LLM 中转服务可用性监控",
+    "description": "code-cli - 实时监控全球 LLM 中转服务的可用性、延迟与赞助链路，帮助开发者快速评估服务商质量，发现最稳定的 API 提供商。支持 Claude、GPT 等主流模型的连通性检测。"
   },
   "common": {
     "loading": "正在同步数据节点...",
@@ -123,22 +123,11 @@
   },
   "footer": {
     "disclaimer": {
-      "title": "免责声明",
-      "dataReference": {
-        "title": "数据仅供参考",
-        "text": "受网络环境影响，不代表服务商绝对质量"
-      },
-      "neutralMaintenance": {
-        "title": "中立维护",
-        "text": "本项目个人维护，保持中立，无利益相关"
-      },
-      "monitoringScope": {
-        "title": "监测范围",
-        "text": "连通性 + 延迟 + 内容校验，数据仅供参考"
-      }
+      "text": "免责声明：待补充"
     },
     "issuesBtn": "问题反馈",
-    "openSourceLabel": "开源项目，欢迎贡献"
+    "openSourceLabel": "开源项目，欢迎贡献",
+    "icp": "ICP备案号：待补充"
   },
   "provider": {
     "pageTitle": "{{name}} - 服务监控",

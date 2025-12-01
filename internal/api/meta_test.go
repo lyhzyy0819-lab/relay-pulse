@@ -193,7 +193,7 @@ func TestGetMetaContent(t *testing.T) {
 			slug:              "",
 			providerName:      "",
 			isProviderPage:    false,
-			expectedTitlePart: "RelayPulse - LLM 中转服务可用性监控",
+			expectedTitlePart: "code-cli - LLM 中转服务可用性监控",
 			expectedDescPart:  "实时监控全球 LLM 中转服务",
 		},
 		{
@@ -202,7 +202,7 @@ func TestGetMetaContent(t *testing.T) {
 			slug:              "",
 			providerName:      "",
 			isProviderPage:    false,
-			expectedTitlePart: "RelayPulse - Availability monitoring",
+			expectedTitlePart: "code-cli - Availability monitoring",
 			expectedDescPart:  "Monitor availability, latency",
 		},
 		{
@@ -418,7 +418,7 @@ func TestInjectMetaTags(t *testing.T) {
 			name:               "中文首页",
 			path:               "/",
 			expectedLang:       "zh-CN",
-			expectedTitlePart:  "RelayPulse - LLM 中转服务",
+			expectedTitlePart:  "code-cli - LLM 中转服务",
 			expectedIsNotFound: false,
 		},
 		{
