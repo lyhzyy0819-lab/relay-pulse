@@ -26,16 +26,16 @@ export const getTimeRanges = (t: TFunction): TimeRange[] => [
 // 状态配置（保留以兼容现有代码）
 export const STATUS: Record<string, StatusConfig> = {
   AVAILABLE: {
-    color: 'bg-orange-600',
-    text: 'text-orange-400',
-    glow: 'shadow-[0_0_10px_rgba(234,88,12,0.6)]',
+    color: 'bg-green-500',
+    text: 'text-green-400',
+    glow: 'shadow-[0_0_10px_rgba(34,197,94,0.6)]',
     label: '可用',
     weight: 3,
   },
   DEGRADED: {
-    color: 'bg-orange-400',
-    text: 'text-orange-300',
-    glow: 'shadow-[0_0_10px_rgba(251,146,60,0.6)]',
+    color: 'bg-green-400',
+    text: 'text-green-300',
+    glow: 'shadow-[0_0_10px_rgba(74,222,128,0.6)]',
     label: '波动',
     weight: 2,
   },
@@ -58,16 +58,16 @@ export const STATUS: Record<string, StatusConfig> = {
 // 状态配置工厂函数（i18n 版本）
 export const getStatusConfig = (t: TFunction): Record<string, StatusConfig> => ({
   AVAILABLE: {
-    color: 'bg-orange-600',
-    text: 'text-orange-400',
-    glow: 'shadow-[0_0_10px_rgba(234,88,12,0.6)]',
+    color: 'bg-green-500',
+    text: 'text-green-400',
+    glow: 'shadow-[0_0_10px_rgba(34,197,94,0.6)]',
     label: t('status.available'),
     weight: 3,
   },
   DEGRADED: {
-    color: 'bg-orange-400',
-    text: 'text-orange-300',
-    glow: 'shadow-[0_0_10px_rgba(251,146,60,0.6)]',
+    color: 'bg-green-400',
+    text: 'text-green-300',
+    glow: 'shadow-[0_0_10px_rgba(74,222,128,0.6)]',
     label: t('status.degraded'),
     weight: 2,
   },
@@ -90,14 +90,14 @@ export const getStatusConfig = (t: TFunction): Record<string, StatusConfig> => (
 // 保留原有导出以兼容不需要翻译的场景
 export const STATUS_COLORS = {
   AVAILABLE: {
-    color: 'bg-orange-600',
-    text: 'text-orange-400',
-    glow: 'shadow-[0_0_10px_rgba(234,88,12,0.6)]',
+    color: 'bg-green-500',
+    text: 'text-green-400',
+    glow: 'shadow-[0_0_10px_rgba(34,197,94,0.6)]',
   },
   DEGRADED: {
-    color: 'bg-orange-400',
-    text: 'text-orange-300',
-    glow: 'shadow-[0_0_10px_rgba(251,146,60,0.6)]',
+    color: 'bg-green-400',
+    text: 'text-green-300',
+    glow: 'shadow-[0_0_10px_rgba(74,222,128,0.6)]',
   },
   MISSING: {
     color: 'bg-slate-400',

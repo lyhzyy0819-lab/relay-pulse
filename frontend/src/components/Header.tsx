@@ -1,5 +1,6 @@
 import { Activity, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { TypewriterText } from './TypewriterText';
 
 interface HeaderProps {
   stats: {
@@ -21,7 +22,7 @@ export function Header({ stats }: HeaderProps) {
             <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500">
-            code-cli
+            <TypewriterText text="Code-CLI" className="inline-block min-w-[120px] sm:min-w-[160px]" />
           </h1>
         </div>
         <p className="text-slate-400 text-xs sm:text-sm flex items-center gap-2">

@@ -1,8 +1,8 @@
 /**
  * 根据可用率计算渐变颜色
  * - 60%以下 → 灰色
- * - 60%-80% → 灰到浅橙渐变
- * - 80%-100% → 浅橙到深橙渐变
+ * - 60%-80% → 灰到浅绿渐变
+ * - 80%-100% → 浅绿到深绿渐变
  * - -1（无数据）→ 灰色
  */
 
@@ -10,8 +10,8 @@ import type { CSSProperties } from 'react';
 
 // 颜色常量
 const GRAY = { r: 107, g: 114, b: 128 };        // #6b7280（不可用）
-const LIGHT_ORANGE = { r: 251, g: 146, b: 60 }; // #fb923c（降级）
-const DEEP_ORANGE = { r: 234, g: 88, b: 12 };   // #ea580c（可用）
+const LIGHT_GREEN = { r: 74, g: 222, b: 128 };  // #4ade80（降级）
+const DEEP_GREEN = { r: 34, g: 197, b: 94 };    // #22c55e（可用）
 const NO_DATA_GRAY = { r: 148, g: 163, b: 184 }; // #94a3b8（无数据）
 
 interface RGB {
@@ -44,15 +44,15 @@ export function availabilityToColor(availability: number): string {
     return `rgb(${GRAY.r}, ${GRAY.g}, ${GRAY.b})`;
   }
 
-  // 60%-80% → 灰到浅橙渐变
+  // 60%-80% → 灰到浅绿渐变
   if (availability < 80) {
     const t = (availability - 60) / 20;
-    return lerpColor(GRAY, LIGHT_ORANGE, t);
+    return lerpColor(GRAY, LIGHT_GREEN, t);
   }
 
-  // 80%-100% → 浅橙到深橙渐变
+  // 80%-100% → 浅绿到深绿渐变
   const t = (availability - 80) / 20;
-  return lerpColor(LIGHT_ORANGE, DEEP_ORANGE, t);
+  return lerpColor(LIGHT_GREEN, DEEP_GREEN, t);
 }
 
 /**
@@ -71,9 +71,9 @@ export function availabilityToStyle(availability: number): CSSProperties {
  *
  * 渐变逻辑：
  * - latency <= 0 → 灰色（无数据）
- * - latency < 30% 阈值 → 深橙（优秀）
- * - 30%-100% 阈值 → 深橙到浅橙渐变（良好）
- * - 100%-200% 阈值 → 浅橙到灰渐变（较慢）
+ * - latency < 30% 阈值 → 深绿（优秀）
+ * - 30%-100% 阈值 → 深绿到浅绿渐变（良好）
+ * - 100%-200% 阈值 → 浅绿到灰渐变（较慢）
  * - >= 200% 阈值 → 灰色（很慢）
  */
 export function latencyToColor(latency: number, slowLatencyMs: number): string {
@@ -84,21 +84,21 @@ export function latencyToColor(latency: number, slowLatencyMs: number): string {
 
   const ratio = latency / slowLatencyMs;
 
-  // < 30% 阈值 → 深橙
+  // < 30% 阈值 → 深绿
   if (ratio < 0.3) {
-    return `rgb(${DEEP_ORANGE.r}, ${DEEP_ORANGE.g}, ${DEEP_ORANGE.b})`;
+    return `rgb(${DEEP_GREEN.r}, ${DEEP_GREEN.g}, ${DEEP_GREEN.b})`;
   }
 
-  // 30%-100% 阈值 → 深橙到浅橙渐变
+  // 30%-100% 阈值 → 深绿到浅绿渐变
   if (ratio < 1) {
     const t = (ratio - 0.3) / 0.7;
-    return lerpColor(DEEP_ORANGE, LIGHT_ORANGE, t);
+    return lerpColor(DEEP_GREEN, LIGHT_GREEN, t);
   }
 
-  // 100%-200% 阈值 → 浅橙到灰渐变
+  // 100%-200% 阈值 → 浅绿到灰渐变
   if (ratio < 2) {
     const t = (ratio - 1) / 1;
-    return lerpColor(LIGHT_ORANGE, GRAY, t);
+    return lerpColor(LIGHT_GREEN, GRAY, t);
   }
 
   // >= 200% 阈值 → 灰色
