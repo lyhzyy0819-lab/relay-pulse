@@ -1,0 +1,147 @@
+interval: "1m"       # 巡检间隔，可写成 "30s"、"1m"、"5m" 等
+slow_latency: "5s"   # 慢请求阈值，超过则从绿降为黄
+
+# ============================================
+# 并发控制与调度策略
+# ============================================
+
+# 最大并发探测数（可选，默认 10）
+# - 不配置或 0: 使用默认值 10
+# - -1: 无限制，自动扩容到监控项数量
+# - >0: 硬上限，超过时监控项会排队等待执行
+# 建议：根据监控项数量和服务器性能调整
+#   - 小规模（<20项）: 10-20
+#   - 中等规模（20-100项）: 50-100
+#   - 大规模（>100项）: -1 或更高值
+max_concurrency: 15
+
+# 错峰调度（可选，默认 true）
+# 开启后会将监控项在巡检周期内均匀分散，避免流量突发
+# - true: 启用错峰（推荐）
+# - false: 所有监控项同时执行（仅用于调试）
+stagger_probes: true
+
+# ============================================
+# API 性能优化
+# ============================================
+
+# 并发查询优化（可选，默认 false）
+# 启用后 /api/status 接口会使用 goroutine 并发查询多个监控项
+# ⚠️ 仅适用于 PostgreSQL，SQLite 使用单连接无并发收益
+# 性能提升：10 个监控项查询时间从 ~2s 降至 ~300ms（-85%）
+enable_concurrent_query: false
+
+# 并发查询限制（可选，默认 10，仅当 enable_concurrent_query=true 时生效）
+# 限制同时执行的数据库查询数量，防止连接池耗尽
+# 建议：根据数据库连接池大小调整
+#   - max_open_conns >= concurrent_query_limit × 并发请求数 × 1.2
+#   - 示例：50 >= 10 × 3 × 1.2 = 36（安全）
+concurrent_query_limit: 10
+
+# 可用率中黄色状态的权重（0-1，默认 0.7）
+# 绿色=1.0, 黄色=degraded_weight, 红色=0.0
+# 可选配置，不设置则使用默认值 0.7
+degraded_weight: 0.7
+
+# ============================================
+# 存储配置（支持 SQLite 和 PostgreSQL）
+# ============================================
+storage:
+  type: "sqlite"  # 存储类型："sqlite" 或 "postgres"
+
+  # SQLite 配置（单机部署推荐）
+  sqlite:
+    path: "monitor.db"  # 数据库文件路径
+
+  # PostgreSQL 配置（K8s/多副本部署推荐）
+  # 取消注释以下配置以启用 PostgreSQL
+  # postgres:
+  #   host: "localhost"
+  #   port: 5432
+  #   user: "monitor"
+  #   password: "monitor_password"  # 建议使用环境变量 MONITOR_POSTGRES_PASSWORD
+  #   database: "llm_monitor"
+  #   sslmode: "disable"  # 生产环境建议使用 "require"
+  #   max_open_conns: 25
+  #   max_idle_conns: 5
+  #   conn_max_lifetime: "1h"
+
+# ============================================
+# 监控任务配置
+# ============================================
+monitors:
+  # --- 88code ---
+  - provider: "88code"
+    provider_slug: "88code"  # 可选：URL slug（用于生成服务商专属页面链接 /p/88code），未配置时使用 provider 小写
+    provider_url: "https://88code.com"  # 可选：服务商官网链接，前端可点击跳转
+    service: "cc"
+    category: "commercial"  # 必填：商业站(commercial) 或 公益站(public)
+    sponsor: "团队自有"      # 必填：提供 API Key 的赞助者
+    sponsor_url: "https://example.com/sponsor"  # 可选：赞助者链接
+    channel: "vip-channel"  # 业务通道标识（可选），用于分类和过滤
+    url: "https://api.88code.com/v1/chat/completions"
+    method: "POST"
+    api_key: "sk-xxxxxxxx"  # 可通过环境变量 MONITOR_88CODE_CC_API_KEY 覆盖
+    headers:
+      Authorization: "Bearer {{API_KEY}}"
+      Content-Type: "application/json"
+    body: |
+      {
+        "model": "claude-3-opus",
+        "messages": [{"role": "user", "content": "hi"}],
+        "max_tokens": 1
+      }
+
+  - provider: "88code"
+    service: "cx"
+    category: "public"           # 公益站
+    sponsor: "社区赞助"          # 由社区赞助者提供
+    channel: "standard-channel"
+    url: "https://api.88code.com/v1/chat/completions"
+    method: "POST"
+    api_key: "sk-xxxxxxxx"
+    headers:
+      Authorization: "Bearer {{API_KEY}}"
+      Content-Type: "application/json"
+    body: |
+      {
+        "model": "gpt-4",
+        "messages": [{"role": "user", "content": "hi"}],
+        "max_tokens": 1
+      }
+    # 可选：要求响应体包含该关键字才视为成功（语义校验）
+    success_contains: "hi"
+
+  # --- DuckCoding (演示不同的 Header 格式) ---
+  - provider: "duckcoding"
+    service: "cc"
+    category: "commercial"
+    sponsor: "duckcoding官方"
+    channel: "vip-channel"
+    url: "https://api.duckcoding.com/v1/messages"
+    method: "POST"
+    api_key: "sk-duck-xxxx"
+    headers:
+      x-api-key: "{{API_KEY}}"
+      anthropic-version: "2023-06-01"
+      content-type: "application/json"
+    body: |
+      {
+        "model": "claude-3-sonnet",
+        "max_tokens": 1,
+        "messages": [{"role": "user", "content": "hi"}]
+      }
+
+  # --- 引用 data/ 目录下 JSON 的示例 ---
+  - provider: "demo"
+    service: "codex"
+    category: "public"
+    sponsor: "示例数据"
+    channel: "test-channel"
+    url: "https://88code.org/openai/v1/responses"
+    method: "POST"
+    api_key: "sk-demo"
+    headers:
+      Authorization: "Bearer {{API_KEY}}"
+      Content-Type: "application/json"
+    body: "!include data/cx_base.json"

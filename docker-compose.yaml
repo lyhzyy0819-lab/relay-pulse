@@ -1,0 +1,203 @@
+
+services:
+  # ============================================
+  # 方式一：使用 SQLite (默认，单机部署)
+  # ============================================
+  monitor:
+    # 使用预构建镜像（生产环境推荐）
+    # image: ghcr.io/prehisle/relay-pulse:latest
+
+    # 本地构建（开发环境，支持 ARM64/AMD64）
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VERSION: ${MONITOR_VERSION:-dev}
+        GIT_COMMIT: ${MONITOR_GIT_COMMIT:-unknown}
+        BUILD_TIME: ${MONITOR_BUILD_TIME:-unknown}
+
+    container_name: relaypulse-monitor
+
+    # 端口映射
+    # 生产环境：80:8080（通过 Cloudflare CDN 访问）
+    # 开发环境：8080:8080（本地直接访问）
+    ports:
+      - "80:8080"
+
+    # 挂载配置文件和数据目录
+    volumes:
+      # 配置文件（必需）
+      - ./config.yaml:/app/config.yaml:ro
+      # 数据目录（⚠️ 使用预构建镜像时必需，本地构建时可选）
+      # 如果使用 ghcr.io 预构建镜像，必须取消注释下行:
+      - ./data:/app/data:ro
+      # SQLite 数据库持久化（使用独立的 /data 目录，避免覆盖 /app 导致二进制文件不更新）
+      - relay-pulse-data:/data
+
+    # 环境变量覆盖 API 密钥 (推荐)
+    environment:
+      # 时区设置
+      - TZ=Asia/Shanghai
+      # SQLite 数据库路径（放在持久化卷 /data 中）
+      - MONITOR_SQLITE_PATH=/data/monitor.db
+
+      # 存储类型（默认 sqlite）
+      # - MONITOR_STORAGE_TYPE=sqlite
+
+      # API 密钥覆盖示例 (格式: MONITOR_<PROVIDER>_<SERVICE>_API_KEY)
+      # - MONITOR_88CODE_CC_API_KEY=sk-your-real-key
+      # - MONITOR_88CODE_CX_API_KEY=sk-another-key
+      # - MONITOR_DUCKCODING_CC_API_KEY=sk-duck-key
+
+    # 从 .env 文件加载环境变量 (推荐用于生产环境)
+    # 使用方式: docker compose --env-file deploy/relaypulse.env up -d
+    # env_file:
+    #   - deploy/relaypulse.env
+
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+    # 重启策略
+    restart: unless-stopped
+
+    # 网络
+    networks:
+      - relay-pulse-network
+
+    # 资源限制 (可选)
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '1'
+    #       memory: 512M
+    #     reservations:
+    #       cpus: '0.5'
+    #       memory: 256M
+
+  # ============================================
+  # 方式二：使用 PostgreSQL (K8s/多副本部署推荐)
+  # ============================================
+  # 取消注释以下配置以启用 PostgreSQL 模式
+
+  # postgres:
+  #   image: postgres:16-alpine
+  #   container_name: relaypulse-postgres
+  #   environment:
+  #     POSTGRES_USER: monitor
+  #     POSTGRES_PASSWORD: monitor_password
+  #     POSTGRES_DB: llm_monitor
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U monitor"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   restart: unless-stopped
+
+  # monitor-pg:
+  #   image: ghcr.io/prehisle/relay-pulse:latest
+  #   container_name: relaypulse-monitor-pg
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - ./config.production.yaml:/config/config.yaml:ro
+  #   environment:
+  #     - TZ=Asia/Shanghai
+  #     - MONITOR_STORAGE_TYPE=postgres
+  #     - MONITOR_POSTGRES_HOST=postgres
+  #     - MONITOR_POSTGRES_PORT=5432
+  #     - MONITOR_POSTGRES_USER=monitor
+  #     - MONITOR_POSTGRES_PASSWORD=monitor_password
+  #     - MONITOR_POSTGRES_DATABASE=llm_monitor
+  #     - MONITOR_POSTGRES_SSLMODE=disable  # ⚠️ 仅限本地测试！生产环境必须使用 require
+  #   healthcheck:
+  #     test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+  #     interval: 30s
+  #     timeout: 5s
+  #     retries: 3
+  #     start_period: 15s
+  #   restart: unless-stopped
+
+volumes:
+  relay-pulse-data:
+    driver: local
+  # postgres_data:  # PostgreSQL 数据卷（使用 PostgreSQL 时取消注释）
+
+networks:
+  relay-pulse-network:
+    driver: bridge
+
+# ============================================
+# 使用说明
+# ============================================
+#
+# ⚠️ 重要：生产部署必须使用环境变量文件加载 API Key！
+#
+# 方式一：SQLite 模式（默认，单机部署）
+# ------------------------------
+# 1. 准备配置文件:
+#    cp config.yaml.example config.yaml
+#    vim config.yaml  # 编辑配置文件
+#
+# 2. 启动服务（推荐使用环境变量覆盖 API Key）:
+#    docker compose --env-file deploy/relaypulse.env up -d monitor
+#    # 或者直接启动（API Key 写在 config.yaml 中）:
+#    docker compose up -d monitor
+#
+# 3. 访问服务:
+#    Web 界面: http://localhost:8080
+#    API: http://localhost:8080/api/status
+#
+# 4. 查看日志:
+#    docker compose logs -f monitor
+#
+# 5. 停止服务:
+#    docker compose down
+#
+# 方式二：PostgreSQL 模式（K8s/多副本推荐）
+# ------------------------------
+# 1. 编辑 docker-compose.yaml，取消注释 postgres 和 monitor-pg 相关配置
+#
+# 2. 在 deploy/relaypulse.env 中设置 PostgreSQL 连接信息:
+#    MONITOR_STORAGE_TYPE=postgres
+#    MONITOR_POSTGRES_HOST=postgres
+#    MONITOR_POSTGRES_PASSWORD=your_secure_password
+#    MONITOR_POSTGRES_SSLMODE=require  # ⚠️ 生产环境必须启用 SSL
+#
+# 3. 启动服务（包含 PostgreSQL）:
+#    docker compose --env-file deploy/relaypulse.env up -d postgres monitor-pg
+#
+# 4. 查看日志:
+#    docker compose logs -f monitor-pg
+#
+# 5. 停止服务:
+#    docker compose down
+#    docker compose down -v  # 同时删除数据卷
+#
+# 自定义 data 文件（可选）
+# ------------------------------
+# data 目录包含 !include 引用的 JSON 文件（如 cc_base.json、cx_base.json）
+# 默认使用镜像内置的 data 文件，无需挂载
+#
+# 如需自定义 data 文件内容:
+# 1. 在 docker-compose.yaml 中取消注释 data 目录挂载:
+#    - ./data:/app/data:ro
+# 2. 编辑本地 data/*.json 文件
+# 3. 重启服务: docker compose restart monitor
+#
+# 开发模式（允许 localhost CORS）
+# ------------------------------
+# 在 deploy/relaypulse.env 中添加:
+# MONITOR_CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+# ============================================

@@ -1,0 +1,56 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation
+README.md
+CONTRIBUTING.md
+CLAUDE.md
+docs/
+*.md
+
+# Build artifacts
+monitor
+monitor.db
+monitor.db.backup_*
+*.log
+
+# Frontend development
+frontend/node_modules
+frontend/dist
+frontend/.vite
+
+# Go development
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+coverage.out
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config (will be mounted)
+config.yaml
+config.postgres.example.yaml
+
+# Air hot reload
+.air.toml
+tmp/
