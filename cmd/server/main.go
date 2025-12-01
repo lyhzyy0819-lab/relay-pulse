@@ -101,7 +101,7 @@ func main() {
 	sched.Start(ctx, cfg)
 
 	// 创建API服务器
-	server := api.NewServer(store, cfg, "8080")
+	server := api.NewServer(store, cfg, "8081")
 
 	// 启动配置监听器（热更新）
 	watcher, err := config.NewWatcher(loader, configFile, func(newCfg *config.AppConfig) {
