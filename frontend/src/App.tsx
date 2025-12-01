@@ -3,26 +3,31 @@ import { Server } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { Header } from './components/Header';
+import { SimpleControls } from './components/SimpleControls';
 import { StatusTable } from './components/StatusTable';
+import { StatusCard } from './components/StatusCard';
 import { Tooltip } from './components/Tooltip';
 import { Footer } from './components/Footer';
 import { useMonitorData } from './hooks/useMonitorData';
-import type { TooltipState, ProcessedMonitorData, SortConfig } from './types';
+import { useUrlState } from './hooks/useUrlState';
+import type { TooltipState, ProcessedMonitorData } from './types';
 
 function App() {
   const { t, i18n } = useTranslation();
 
-  // 固定的筛选和视图状态（不再需要用户交互控制）
-  const timeRange = '24h';
+  // 使用 URL 状态同步
+  const [state, actions] = useUrlState();
+  const { timeRange, viewMode, sortConfig } = state;
+  const { setTimeRange, setViewMode, setSortConfig } = actions;
+
+  // 保留硬编码的筛选器状态（不使用，但 useMonitorData 需要）
   const filterProvider = 'all';
   const filterService = 'all';
   const filterChannel = 'all';
   const filterCategory = 'all';
 
-  const [sortConfig, setSortConfig] = useState<SortConfig>({
-    key: 'uptime',
-    direction: 'desc',
-  });
+  // 刷新令牌状态（暂未使用，预留给未来手动刷新功能）
+  // const [reloadToken, setReloadToken] = useState(0);
 
   const [tooltip, setTooltip] = useState<TooltipState>({
     show: false,
@@ -46,6 +51,11 @@ function App() {
       direction = 'asc';
     }
     setSortConfig({ key, direction });
+  };
+
+  const handleRefresh = () => {
+    // TODO: 实现手动刷新逻辑
+    window.location.reload();
   };
 
   const handleBlockHover = (
@@ -88,6 +98,16 @@ function App() {
           {/* 头部 */}
           <Header stats={stats} />
 
+          {/* 精简控制栏 */}
+          <SimpleControls
+            timeRange={timeRange}
+            viewMode={viewMode}
+            loading={loading}
+            onTimeRangeChange={setTimeRange}
+            onViewModeChange={setViewMode}
+            onRefresh={handleRefresh}
+          />
+
           {/* 内容区域 */}
           {error ? (
             <div className="flex flex-col items-center justify-center py-20 text-rose-400">
@@ -104,7 +124,7 @@ function App() {
               <Server size={64} className="mb-4 opacity-20" />
               <p className="text-lg">{t('common.noData')}</p>
             </div>
-          ) : (
+          ) : viewMode === 'table' ? (
             <StatusTable
               data={data}
               sortConfig={sortConfig}
@@ -114,6 +134,19 @@ function App() {
               onBlockHover={handleBlockHover}
               onBlockLeave={handleBlockLeave}
             />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {data.map((item) => (
+                <StatusCard
+                  key={`${item.providerId}-${item.serviceType}`}
+                  item={item}
+                  timeRange={timeRange}
+                  slowLatencyMs={slowLatencyMs}
+                  onBlockHover={handleBlockHover}
+                  onBlockLeave={handleBlockLeave}
+                />
+              ))}
+            </div>
           )}
 
           {/* 免责声明 */}
