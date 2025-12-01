@@ -58,7 +58,7 @@ function ToastItem({ toast, onClose }: { toast: ToastMessage; onClose: () => voi
   const bgColor = {
     success: 'bg-emerald-500/90',
     error: 'bg-rose-500/90',
-    info: 'bg-cyan-500/90',
+    info: 'bg-amber-500/90',
   }[toast.type];
 
   const Icon = toast.type === 'error' ? X : Check;

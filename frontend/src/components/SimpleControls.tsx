@@ -25,14 +25,14 @@ export function SimpleControls({
   return (
     <div className="flex flex-col sm:flex-row gap-3 mb-4">
       {/* 时间范围选择 */}
-      <div className="flex-1 bg-slate-900/40 p-2 rounded-2xl border border-slate-800/50 backdrop-blur-md flex items-center gap-1 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+      <div className="flex-1 bg-slate-800/40 p-2 rounded-2xl border border-slate-800/50 backdrop-blur-md flex items-center gap-1 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
         {getTimeRanges(t).map((range) => (
           <button
             key={range.id}
             onClick={() => onTimeRangeChange(range.id)}
             className={`px-3 py-2 text-xs font-medium rounded-xl transition-all duration-200 whitespace-nowrap flex-shrink-0 ${
               timeRange === range.id
-                ? 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25'
+                ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-lg shadow-amber-500/25'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
             }`}
           >
@@ -42,14 +42,14 @@ export function SimpleControls({
       </div>
 
       {/* 视图切换和刷新按钮 */}
-      <div className="bg-slate-900/40 p-2 rounded-2xl border border-slate-800/50 backdrop-blur-md flex items-center gap-2">
+      <div className="bg-slate-800/40 p-2 rounded-2xl border border-slate-800/50 backdrop-blur-md flex items-center gap-2">
         {/* 视图切换 */}
         <div className="flex bg-slate-800 rounded-lg p-1 border border-slate-700">
           <button
             onClick={() => onViewModeChange('table')}
             className={`p-2.5 rounded min-w-[44px] min-h-[44px] flex items-center justify-center ${
               viewMode === 'table'
-                ? 'bg-slate-700 text-cyan-400 shadow'
+                ? 'bg-slate-700 text-amber-400 shadow'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
             title={t('controls.views.table')}
@@ -61,7 +61,7 @@ export function SimpleControls({
             onClick={() => onViewModeChange('grid')}
             className={`p-2.5 rounded min-w-[44px] min-h-[44px] flex items-center justify-center ${
               viewMode === 'grid'
-                ? 'bg-slate-700 text-cyan-400 shadow'
+                ? 'bg-slate-700 text-amber-400 shadow'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
             title={t('controls.views.card')}
@@ -74,7 +74,7 @@ export function SimpleControls({
         {/* 刷新按钮 */}
         <button
           onClick={onRefresh}
-          className="p-2.5 rounded-lg bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 transition-colors border border-cyan-500/20 group min-w-[44px] min-h-[44px] flex items-center justify-center"
+          className="p-2.5 rounded-lg bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-colors border border-amber-500/20 group min-w-[44px] min-h-[44px] flex items-center justify-center"
           title={t('common.refresh')}
           aria-label={t('common.refresh')}
         >

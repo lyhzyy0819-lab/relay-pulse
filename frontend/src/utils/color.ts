@@ -1,18 +1,18 @@
 /**
  * 根据可用率计算渐变颜色
- * - 60%以下 → 红色
- * - 60%-80% → 红到黄渐变
- * - 80%-100% → 黄到绿渐变
+ * - 60%以下 → 灰色
+ * - 60%-80% → 灰到浅橙渐变
+ * - 80%-100% → 浅橙到深橙渐变
  * - -1（无数据）→ 灰色
  */
 
 import type { CSSProperties } from 'react';
 
 // 颜色常量
-const RED = { r: 239, g: 68, b: 68 };     // #ef4444
-const YELLOW = { r: 234, g: 179, b: 8 };   // #eab308
-const GREEN = { r: 34, g: 197, b: 94 };    // #22c55e
-const GRAY = { r: 148, g: 163, b: 184 };   // #94a3b8
+const GRAY = { r: 107, g: 114, b: 128 };        // #6b7280（不可用）
+const LIGHT_ORANGE = { r: 251, g: 146, b: 60 }; // #fb923c（降级）
+const DEEP_ORANGE = { r: 234, g: 88, b: 12 };   // #ea580c（可用）
+const NO_DATA_GRAY = { r: 148, g: 163, b: 184 }; // #94a3b8（无数据）
 
 interface RGB {
   r: number;
@@ -36,23 +36,23 @@ function lerpColor(color1: RGB, color2: RGB, t: number): string {
 export function availabilityToColor(availability: number): string {
   // 无数据
   if (availability < 0) {
+    return `rgb(${NO_DATA_GRAY.r}, ${NO_DATA_GRAY.g}, ${NO_DATA_GRAY.b})`;
+  }
+
+  // 60%以下 → 灰色
+  if (availability < 60) {
     return `rgb(${GRAY.r}, ${GRAY.g}, ${GRAY.b})`;
   }
 
-  // 60%以下 → 红色
-  if (availability < 60) {
-    return `rgb(${RED.r}, ${RED.g}, ${RED.b})`;
-  }
-
-  // 60%-80% → 红到黄渐变
+  // 60%-80% → 灰到浅橙渐变
   if (availability < 80) {
     const t = (availability - 60) / 20;
-    return lerpColor(RED, YELLOW, t);
+    return lerpColor(GRAY, LIGHT_ORANGE, t);
   }
 
-  // 80%-100% → 黄到绿渐变
+  // 80%-100% → 浅橙到深橙渐变
   const t = (availability - 80) / 20;
-  return lerpColor(YELLOW, GREEN, t);
+  return lerpColor(LIGHT_ORANGE, DEEP_ORANGE, t);
 }
 
 /**
@@ -71,36 +71,36 @@ export function availabilityToStyle(availability: number): CSSProperties {
  *
  * 渐变逻辑：
  * - latency <= 0 → 灰色（无数据）
- * - latency < 30% 阈值 → 绿色（优秀）
- * - 30%-100% 阈值 → 绿到黄渐变（良好）
- * - 100%-200% 阈值 → 黄到红渐变（较慢）
- * - >= 200% 阈值 → 红色（很慢）
+ * - latency < 30% 阈值 → 深橙（优秀）
+ * - 30%-100% 阈值 → 深橙到浅橙渐变（良好）
+ * - 100%-200% 阈值 → 浅橙到灰渐变（较慢）
+ * - >= 200% 阈值 → 灰色（很慢）
  */
 export function latencyToColor(latency: number, slowLatencyMs: number): string {
   // 无数据或配置无效
   if (latency <= 0 || slowLatencyMs <= 0) {
-    return `rgb(${GRAY.r}, ${GRAY.g}, ${GRAY.b})`;
+    return `rgb(${NO_DATA_GRAY.r}, ${NO_DATA_GRAY.g}, ${NO_DATA_GRAY.b})`;
   }
 
   const ratio = latency / slowLatencyMs;
 
-  // < 30% 阈值 → 绿色
+  // < 30% 阈值 → 深橙
   if (ratio < 0.3) {
-    return `rgb(${GREEN.r}, ${GREEN.g}, ${GREEN.b})`;
+    return `rgb(${DEEP_ORANGE.r}, ${DEEP_ORANGE.g}, ${DEEP_ORANGE.b})`;
   }
 
-  // 30%-100% 阈值 → 绿到黄渐变
+  // 30%-100% 阈值 → 深橙到浅橙渐变
   if (ratio < 1) {
     const t = (ratio - 0.3) / 0.7;
-    return lerpColor(GREEN, YELLOW, t);
+    return lerpColor(DEEP_ORANGE, LIGHT_ORANGE, t);
   }
 
-  // 100%-200% 阈值 → 黄到红渐变
+  // 100%-200% 阈值 → 浅橙到灰渐变
   if (ratio < 2) {
     const t = (ratio - 1) / 1;
-    return lerpColor(YELLOW, RED, t);
+    return lerpColor(LIGHT_ORANGE, GRAY, t);
   }
 
-  // >= 200% 阈值 → 红色
-  return `rgb(${RED.r}, ${RED.g}, ${RED.b})`;
+  // >= 200% 阈值 → 灰色
+  return `rgb(${GRAY.r}, ${GRAY.g}, ${GRAY.b})`;
 }

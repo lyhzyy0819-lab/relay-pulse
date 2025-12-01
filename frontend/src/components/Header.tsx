@@ -17,10 +17,10 @@ export function Header({ stats }: HeaderProps) {
       {/* 左侧：Logo 和标语 */}
       <div>
         <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
-          <div className="p-1.5 sm:p-2 bg-cyan-500/10 rounded-lg border border-cyan-500/20">
-            <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />
+          <div className="p-1.5 sm:p-2 bg-amber-500/10 rounded-lg border border-amber-500/20">
+            <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500">
             code-cli
           </h1>
         </div>

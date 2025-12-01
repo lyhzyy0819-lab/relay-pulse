@@ -54,16 +54,16 @@ function MobileListItem({
   );
 
   return (
-    <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-3">
+    <div className="bg-slate-800/60 border border-slate-800 rounded-xl p-4 space-y-3">
       {/* 主要信息行 */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           {/* 服务图标 */}
           <div className="w-10 h-10 flex-shrink-0 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700">
             {item.serviceType === 'cc' ? (
-              <Zap className="text-purple-400" size={18} />
+              <Zap className="text-amber-400" size={18} />
             ) : (
-              <Shield className="text-blue-400" size={18} />
+              <Shield className="text-orange-400" size={18} />
             )}
           </div>
 
@@ -92,8 +92,8 @@ function MobileListItem({
               <span
                 className={`px-1.5 py-0.5 rounded text-[10px] font-mono border ${
                   item.serviceType === 'cc'
-                    ? 'border-purple-500/30 text-purple-300 bg-purple-500/10'
-                    : 'border-blue-500/30 text-blue-300 bg-blue-500/10'
+                    ? 'border-amber-500/30 text-amber-300 bg-amber-500/10'
+                    : 'border-orange-500/30 text-orange-300 bg-orange-500/10'
                 }`}
               >
                 {item.serviceType.toUpperCase()}
@@ -225,7 +225,7 @@ function MobileSortMenu({
           onClick={() => onSort(option.key)}
           className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors flex-shrink-0 ${
             sortConfig.key === option.key
-              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
               : 'bg-slate-800 text-slate-400 border border-slate-700 hover:text-slate-200'
           }`}
         >
@@ -269,9 +269,9 @@ export function StatusTable({
     if (sortConfig.key !== columnKey)
       return <ArrowUpDown size={14} className="opacity-30 ml-1" />;
     return sortConfig.direction === 'asc' ? (
-      <ArrowUp size={14} className="text-cyan-400 ml-1" />
+      <ArrowUp size={14} className="text-amber-400 ml-1" />
     ) : (
-      <ArrowDown size={14} className="text-cyan-400 ml-1" />
+      <ArrowDown size={14} className="text-amber-400 ml-1" />
     );
   };
 
@@ -303,12 +303,12 @@ export function StatusTable({
   // 桌面端：表格视图
   return (
     <div className="overflow-x-auto rounded-2xl border border-slate-800/50 shadow-xl">
-      <table className="w-full text-left border-collapse bg-slate-900/40 backdrop-blur-sm">
+      <table className="w-full text-left border-collapse bg-slate-800/40 backdrop-blur-sm">
         <thead>
           <tr className="border-b border-slate-700/50 text-slate-400 text-xs uppercase tracking-wider">
             {showProvider && (
               <th
-                className="p-4 font-medium cursor-pointer hover:text-cyan-400 transition-colors"
+                className="p-4 font-medium cursor-pointer hover:text-amber-400 transition-colors"
                 onClick={() => onSort('providerName')}
               >
                 <div className="flex items-center">
@@ -318,7 +318,7 @@ export function StatusTable({
             )}
             {showSponsor && (
               <th
-                className="p-4 font-medium cursor-pointer hover:text-cyan-400 transition-colors"
+                className="p-4 font-medium cursor-pointer hover:text-amber-400 transition-colors"
                 onClick={() => onSort('sponsor')}
               >
                 <div className="flex items-center">
@@ -327,7 +327,7 @@ export function StatusTable({
               </th>
             )}
             <th
-              className="p-4 font-medium cursor-pointer hover:text-cyan-400 transition-colors"
+              className="p-4 font-medium cursor-pointer hover:text-amber-400 transition-colors"
               onClick={() => onSort('serviceType')}
             >
               <div className="flex items-center">
@@ -335,7 +335,7 @@ export function StatusTable({
               </div>
             </th>
             <th
-              className="p-4 font-medium cursor-pointer hover:text-cyan-400 transition-colors"
+              className="p-4 font-medium cursor-pointer hover:text-amber-400 transition-colors"
               onClick={() => onSort('channel')}
             >
               <div className="flex items-center">
@@ -343,7 +343,7 @@ export function StatusTable({
               </div>
             </th>
             <th
-              className="p-4 font-medium cursor-pointer hover:text-cyan-400 transition-colors"
+              className="p-4 font-medium cursor-pointer hover:text-amber-400 transition-colors"
               onClick={() => onSort('currentStatus')}
             >
               <div className="flex items-center">
@@ -351,7 +351,7 @@ export function StatusTable({
               </div>
             </th>
             <th
-              className="p-4 font-medium cursor-pointer hover:text-cyan-400 transition-colors"
+              className="p-4 font-medium cursor-pointer hover:text-amber-400 transition-colors"
               onClick={() => onSort('uptime')}
             >
               <div className="flex items-center">
@@ -404,8 +404,8 @@ export function StatusTable({
                 <span
                   className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-mono border ${
                     item.serviceType === 'cc'
-                      ? 'border-purple-500/30 text-purple-300 bg-purple-500/10'
-                      : 'border-blue-500/30 text-blue-300 bg-blue-500/10'
+                      ? 'border-amber-500/30 text-amber-300 bg-amber-500/10'
+                      : 'border-orange-500/30 text-orange-300 bg-orange-500/10'
                   }`}
                 >
                   {item.serviceType === 'cc' && <Zap size={10} className="mr-1" />}

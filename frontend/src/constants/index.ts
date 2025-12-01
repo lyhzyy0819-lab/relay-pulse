@@ -26,16 +26,16 @@ export const getTimeRanges = (t: TFunction): TimeRange[] => [
 // 状态配置（保留以兼容现有代码）
 export const STATUS: Record<string, StatusConfig> = {
   AVAILABLE: {
-    color: 'bg-emerald-500',
-    text: 'text-emerald-400',
-    glow: 'shadow-[0_0_10px_rgba(16,185,129,0.6)]',
+    color: 'bg-orange-600',
+    text: 'text-orange-400',
+    glow: 'shadow-[0_0_10px_rgba(234,88,12,0.6)]',
     label: '可用',
     weight: 3,
   },
   DEGRADED: {
-    color: 'bg-amber-400',
-    text: 'text-amber-400',
-    glow: 'shadow-[0_0_10px_rgba(251,191,36,0.6)]',
+    color: 'bg-orange-400',
+    text: 'text-orange-300',
+    glow: 'shadow-[0_0_10px_rgba(251,146,60,0.6)]',
     label: '波动',
     weight: 2,
   },
@@ -47,9 +47,9 @@ export const STATUS: Record<string, StatusConfig> = {
     weight: 1,  // 算作可用（避免初期可用率过低）
   },
   UNAVAILABLE: {
-    color: 'bg-rose-500',
-    text: 'text-rose-400',
-    glow: 'shadow-[0_0_10px_rgba(244,63,94,0.6)]',
+    color: 'bg-slate-500',
+    text: 'text-slate-400',
+    glow: 'shadow-[0_0_10px_rgba(107,114,128,0.6)]',
     label: '不可用',
     weight: 1,
   },
@@ -58,16 +58,16 @@ export const STATUS: Record<string, StatusConfig> = {
 // 状态配置工厂函数（i18n 版本）
 export const getStatusConfig = (t: TFunction): Record<string, StatusConfig> => ({
   AVAILABLE: {
-    color: 'bg-emerald-500',
-    text: 'text-emerald-400',
-    glow: 'shadow-[0_0_10px_rgba(16,185,129,0.6)]',
+    color: 'bg-orange-600',
+    text: 'text-orange-400',
+    glow: 'shadow-[0_0_10px_rgba(234,88,12,0.6)]',
     label: t('status.available'),
     weight: 3,
   },
   DEGRADED: {
-    color: 'bg-amber-400',
-    text: 'text-amber-400',
-    glow: 'shadow-[0_0_10px_rgba(251,191,36,0.6)]',
+    color: 'bg-orange-400',
+    text: 'text-orange-300',
+    glow: 'shadow-[0_0_10px_rgba(251,146,60,0.6)]',
     label: t('status.degraded'),
     weight: 2,
   },
@@ -79,9 +79,9 @@ export const getStatusConfig = (t: TFunction): Record<string, StatusConfig> => (
     weight: 1,  // 算作可用（避免初期可用率过低）
   },
   UNAVAILABLE: {
-    color: 'bg-rose-500',
-    text: 'text-rose-400',
-    glow: 'shadow-[0_0_10px_rgba(244,63,94,0.6)]',
+    color: 'bg-slate-500',
+    text: 'text-slate-400',
+    glow: 'shadow-[0_0_10px_rgba(107,114,128,0.6)]',
     label: t('status.unavailable'),
     weight: 1,
   },
@@ -90,14 +90,14 @@ export const getStatusConfig = (t: TFunction): Record<string, StatusConfig> => (
 // 保留原有导出以兼容不需要翻译的场景
 export const STATUS_COLORS = {
   AVAILABLE: {
-    color: 'bg-emerald-500',
-    text: 'text-emerald-400',
-    glow: 'shadow-[0_0_10px_rgba(16,185,129,0.6)]',
+    color: 'bg-orange-600',
+    text: 'text-orange-400',
+    glow: 'shadow-[0_0_10px_rgba(234,88,12,0.6)]',
   },
   DEGRADED: {
-    color: 'bg-amber-400',
-    text: 'text-amber-400',
-    glow: 'shadow-[0_0_10px_rgba(251,191,36,0.6)]',
+    color: 'bg-orange-400',
+    text: 'text-orange-300',
+    glow: 'shadow-[0_0_10px_rgba(251,146,60,0.6)]',
   },
   MISSING: {
     color: 'bg-slate-400',
@@ -105,9 +105,9 @@ export const STATUS_COLORS = {
     glow: 'shadow-[0_0_10px_rgba(148,163,184,0.4)]',
   },
   UNAVAILABLE: {
-    color: 'bg-rose-500',
-    text: 'text-rose-400',
-    glow: 'shadow-[0_0_10px_rgba(244,63,94,0.6)]',
+    color: 'bg-slate-500',
+    text: 'text-slate-400',
+    glow: 'shadow-[0_0_10px_rgba(107,114,128,0.6)]',
   },
 } as const;
 

@@ -84,14 +84,14 @@ function App() {
         <meta name="description" content={t('meta.description')} />
       </Helmet>
 
-      <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-cyan-500 selection:text-white overflow-x-hidden">
+      <div className="min-h-screen bg-slate-800 text-slate-200 font-sans selection:bg-amber-500 selection:text-white overflow-x-hidden">
         {/* 全局 Tooltip */}
         <Tooltip tooltip={tooltip} onClose={handleBlockLeave} slowLatencyMs={slowLatencyMs} />
 
         {/* 背景装饰 */}
         <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-          <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px]" />
-          <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-cyan-600/10 rounded-full blur-[120px]" />
+          <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-amber-500/10 rounded-full blur-[120px]" />
+          <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-amber-500/10 rounded-full blur-[120px]" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-4 sm:py-6 sm:px-6 lg:px-8">
@@ -116,7 +116,7 @@ function App() {
             </div>
           ) : loading && data.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64 text-slate-500 gap-4">
-              <div className="w-12 h-12 border-4 border-cyan-500/20 border-t-cyan-500 rounded-full animate-spin" />
+              <div className="w-12 h-12 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin" />
               <p className="animate-pulse">{t('common.loading')}</p>
             </div>
           ) : data.length === 0 ? (

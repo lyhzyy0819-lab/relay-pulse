@@ -51,7 +51,7 @@ export function ExternalLink({ href, children, className = '', trackLabel }: Ext
         <span title="非加密 HTTP 链接" className="inline-flex" aria-label="警告：非加密链接">
           <AlertTriangle
             size={12}
-            className="text-yellow-500 flex-shrink-0"
+            className="text-amber-500 flex-shrink-0"
             aria-hidden="true"
           />
         </span>

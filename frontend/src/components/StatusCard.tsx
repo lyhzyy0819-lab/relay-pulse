@@ -44,7 +44,7 @@ export function StatusCard({
   const currentTimeRange = getTimeRanges(t).find((r) => r.id === timeRange);
 
   return (
-    <div className="group relative bg-slate-900/60 border border-slate-800 hover:border-cyan-500/30 rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:shadow-[0_0_30px_rgba(6,182,212,0.1)] backdrop-blur-sm overflow-hidden">
+    <div className="group relative bg-slate-800/60 border border-slate-800 hover:border-amber-500/30 rounded-2xl p-4 sm:p-6 transition-all duration-300 hover:shadow-[0_0_30px_rgba(245,158,11,0.1)] backdrop-blur-sm overflow-hidden">
       {/* 顶部状态条 */}
       <div className={`absolute top-0 left-0 w-full h-1 ${STATUS[item.currentStatus].color}`} />
 
@@ -54,9 +54,9 @@ export function StatusCard({
         <div className="flex gap-3 sm:gap-4 items-start sm:items-center">
           <div className="w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 rounded-xl bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-slate-600 transition-colors">
             {item.serviceType === 'cc' ? (
-              <Zap className="text-purple-400" size={20} />
+              <Zap className="text-amber-400" size={20} />
             ) : (
-              <Shield className="text-blue-400" size={20} />
+              <Shield className="text-orange-400" size={20} />
             )}
           </div>
           <div className="flex-1 min-w-0">
@@ -69,8 +69,8 @@ export function StatusCard({
               <span
                 className={`px-2 py-0.5 rounded text-[10px] font-mono border flex-shrink-0 ${
                   item.serviceType === 'cc'
-                    ? 'border-purple-500/30 text-purple-300 bg-purple-500/10'
-                    : 'border-blue-500/30 text-blue-300 bg-blue-500/10'
+                    ? 'border-amber-500/30 text-amber-300 bg-amber-500/10'
+                    : 'border-orange-500/30 text-orange-300 bg-orange-500/10'
                 }`}
               >
                 {item.serviceType.toUpperCase()}
