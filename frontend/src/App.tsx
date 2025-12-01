@@ -130,6 +130,8 @@ function App() {
               sortConfig={sortConfig}
               timeRange={timeRange}
               slowLatencyMs={slowLatencyMs}
+              showProvider={false}
+              showSponsor={false}
               onSort={handleSort}
               onBlockHover={handleBlockHover}
               onBlockLeave={handleBlockLeave}
@@ -142,6 +144,7 @@ function App() {
                   item={item}
                   timeRange={timeRange}
                   slowLatencyMs={slowLatencyMs}
+                  showProvider={false}
                   onBlockHover={handleBlockHover}
                   onBlockLeave={handleBlockLeave}
                 />
