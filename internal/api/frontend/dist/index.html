@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="code-cli - Monitor availability, latency, and sponsored routes of LLM relay services worldwide in real time, helping developers quickly evaluate provider quality and discover the most stable API providers." />
+    <title>code-cli - Availability monitoring for LLM relay services</title>
+
+    <!-- Google Analytics -->
+    <script>
+      window.GA_MEASUREMENT_ID = 'G-NCRF4ZNV4C';
+      // 只有当 VITE_GA_MEASUREMENT_ID 被设置为真实 ID 时才加载
+      if (window.GA_MEASUREMENT_ID && window.GA_MEASUREMENT_ID.startsWith('G-')) {
+        (function() {
+          var script = document.createElement('script');
+          script.async = true;
+          script.src = 'https://www.googletagmanager.com/gtag/js?id=' + window.GA_MEASUREMENT_ID;
+          document.head.appendChild(script);
+
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          window.gtag = gtag;
+          gtag('js', new Date());
+          gtag('config', window.GA_MEASUREMENT_ID);
+        })();
+      }
+    </script>
+    <script type="module" crossorigin src="/assets/index-lyjpRGYG.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/react-vendor-OvXVS5lI.js">
+    <link rel="modulepreload" crossorigin href="/assets/router-Bv_Qn1wY.js">
+    <link rel="modulepreload" crossorigin href="/assets/helmet-CzrW8xDS.js">
+    <link rel="modulepreload" crossorigin href="/assets/icons-DIKtrEYc.js">
+    <link rel="modulepreload" crossorigin href="/assets/i18n-CHCxKNI1.js">
+    <link rel="stylesheet" crossorigin href="/assets/index-B0X_J6OV.css">
+  </head>
+  <body style="margin: 0; background-color: #020617;">
+    <div id="root">
+      <!-- 初始加载状态：在 React 挂载前显示，避免白屏闪烁 -->
+      <div id="initial-loader" style="
+        min-height: 100vh;
+        background-color: #020617;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      ">
+        <!-- 三点跳动动画 -->
+        <div class="dot" style="animation-delay: 0s;"></div>
+        <div class="dot" style="animation-delay: 0.15s;"></div>
+        <div class="dot" style="animation-delay: 0.3s;"></div>
+        <style>
+          .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            animation: bounce 0.6s ease-in-out infinite alternate;
+          }
+          @keyframes bounce {
+            from { transform: translateY(0); opacity: 0.4; }
+            to { transform: translateY(-12px); opacity: 1; }
+          }
+        </style>
+      </div>
+    </div>
+  </body>
+</html>

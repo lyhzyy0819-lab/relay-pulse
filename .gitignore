@@ -34,8 +34,9 @@ frontend/dist/
 frontend/.env*
 !frontend/.env.production  # 允许提交生产环境配置模板
 
-# Embedded frontend (symlink for development)
+# Embedded frontend (for Go embed)
 internal/api/frontend/
+!internal/api/frontend/dist/  # 允许提交编译后的 dist 目录
 
 # Config files
 config.yaml
